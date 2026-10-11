@@ -158,18 +158,5 @@ No Minikube, execute o comando abaixo para abrir a URL no navegador:
 ```bash
 minikube service meu-service
 ```
-*(Tire um print da tela do navegador exibindo sua aplicação rodando!)*
 
----
-
-## 👥 5. Divisão de Contribuição da Dupla (Pedro & Otávio)
-
-Para demonstrar a contribuição de ambos no GitHub:
-
-| Integrante | Responsabilidades e Entregáveis |
-|---|---|
-| **Pedro** | Construção da arquitetura no Draw.io (`kubernetes.drawio`), implementação do `pod.yml` e build da imagem Docker. |
-| **Otávio** | Elaboração do documento técnico (`README.md`), implementação do `service.yml` e execução/coleta dos artefatos no Minikube. |
-
-> 💡 **Dica de versionamento no Git:** Para comprovar a participação de ambos no repositório, cada integrante deve realizar os commits a partir do seu próprio usuário e máquina local via Git.
 
