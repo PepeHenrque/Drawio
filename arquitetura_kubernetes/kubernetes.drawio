@@ -1,0 +1,190 @@
+<mxfile host="Electron" modified="2026-10-11T15:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="k8s-architecture" name="Arquitetura Kubernetes">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TÍTULO PRINCIPAL -->
+        <mxCell id="title" value="ARQUITETURA DE FUNCIONAMENTO DO KUBERNETES" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ================= USUÁRIO & KUBECTL ================= -->
+        <mxCell id="user_box" value="Administrador / Desenvolvedor&#xa;(CLI)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="160" width="200" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="kubectl" value="&lt;b&gt;kubectl&lt;/b&gt;&#xa;(Ferramenta de Linha&#xa;de Comando CLI)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#326ce5;strokeColor=#1a4299;fontColor=#ffffff;fontSize=12;" vertex="1" parent="user_box">
+          <mxGeometry y="26" width="200" height="104" as="geometry" />
+        </mxCell>
+
+        <!-- ================= USUÁRIO EXTERNO (CLIENTE WEB) ================= -->
+        <mxCell id="client_box" value="Usuário Externo&#xa;(Navegador Web)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#333333;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="550" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="browser" value="&lt;b&gt;Navegador / App Client&lt;/b&gt;&#xa;Acesso HTTP via porta NodePort&#xa;(Ex: http://minikube:30080)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#000000;fontSize=12;" vertex="1" parent="client_box">
+          <mxGeometry y="26" width="200" height="84" as="geometry" />
+        </mxCell>
+
+        <!-- ================= CONTROL PLANE (MASTER NODE) ================= -->
+        <mxCell id="control_plane" value="CONTROL PLANE (MASTER NODE) - Cérebro do Cluster" style="swimlane;fontStyle=1;align=left;spacingLeft=15;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=0;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#e1f5fe;strokeColor=#0288d1;fontColor=#01579b;fontSize=15;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="90" width="480" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="control_plane_content" value="" style="group" vertex="1" parent="control_plane">
+          <mxGeometry y="40" width="480" height="340" as="geometry" />
+        </mxCell>
+
+        <!-- Kube-apiserver -->
+        <mxCell id="apiserver" value="&lt;b&gt;kube-apiserver&lt;/b&gt;&lt;br&gt;Ponto central de comunicação REST&lt;br&gt;(Expõe a API do Kubernetes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#326ce5;strokeColor=#1a4299;fontColor=#ffffff;fontSize=12;fontStyle=0;" vertex="1" parent="control_plane_content">
+          <mxGeometry x="40" y="30" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- etcd -->
+        <mxCell id="etcd" value="&lt;b&gt;etcd&lt;/b&gt;&lt;br&gt;Banco Chave-Valor Distribuído&lt;br&gt;(Estado e Configuração do Cluster)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4caf50;strokeColor=#2e7d32;fontColor=#ffffff;fontSize=12;" vertex="1" parent="control_plane_content">
+          <mxGeometry x="260" y="30" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- kube-scheduler -->
+        <mxCell id="scheduler" value="&lt;b&gt;kube-scheduler&lt;/b&gt;&lt;br&gt;Agendador de Pods&lt;br&gt;(Decide qual Worker Node rodará o Pod)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ff9800;strokeColor=#e65100;fontColor=#ffffff;fontSize=12;" vertex="1" parent="control_plane_content">
+          <mxGeometry x="40" y="140" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- kube-controller-manager -->
+        <mxCell id="controller_manager" value="&lt;b&gt;kube-controller-manager&lt;/b&gt;&lt;br&gt;Controladores de Ciclo de Vida&lt;br&gt;(ReplicaSet, Node, Endpoint, etc.)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9c27b0;strokeColor=#4a148c;fontColor=#ffffff;fontSize=12;" vertex="1" parent="control_plane_content">
+          <mxGeometry x="260" y="140" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- cloud-controller-manager (opcional/complemento) -->
+        <mxCell id="replicaset_info" value="&lt;b&gt;Controlador de Réplicas (ReplicaSet)&lt;/b&gt;&lt;br&gt;Garante a quantidade exata de Pods em execução" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#ab47bc;fontColor=#4a148c;fontSize=11;" vertex="1" parent="control_plane_content">
+          <mxGeometry x="40" y="240" width="400" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ================= WORKER NODE ================= -->
+        <mxCell id="worker_node" value="WORKER NODE (NÓ DE EXECUÇÃO)" style="swimlane;fontStyle=1;align=left;spacingLeft=15;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=0;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#e8f5e9;strokeColor=#43a047;fontColor=#1b5e20;fontSize=15;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="510" width="850" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="worker_content" value="" style="group" vertex="1" parent="worker_node">
+          <mxGeometry y="40" width="850" height="350" as="geometry" />
+        </mxCell>
+
+        <!-- kubelet -->
+        <mxCell id="kubelet" value="&lt;b&gt;kubelet&lt;/b&gt;&lt;br&gt;Agente do Nó&lt;br&gt;(Garante que os containers&#xa;estão rodando conforme especificado)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#326ce5;strokeColor=#1a4299;fontColor=#ffffff;fontSize=12;" vertex="1" parent="worker_content">
+          <mxGeometry x="40" y="20" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- kube-proxy -->
+        <mxCell id="kubeproxy" value="&lt;b&gt;kube-proxy&lt;/b&gt;&lt;br&gt;Proxy de Rede do Nó&lt;br&gt;(Encaminha tráfego e gerencia regras de iptables/IPVS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#009688;strokeColor=#004d40;fontColor=#ffffff;fontSize=12;" vertex="1" parent="worker_content">
+          <mxGeometry x="280" y="20" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Container Runtime -->
+        <mxCell id="runtime" value="&lt;b&gt;Container Runtime&lt;/b&gt;&lt;br&gt;(containerd / Docker / CRI-O)&lt;br&gt;Responsável por baixar e rodar containers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#607d8b;strokeColor=#263238;fontColor=#ffffff;fontSize=12;" vertex="1" parent="worker_content">
+          <mxGeometry x="40" y="120" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- SERVICE -->
+        <mxCell id="service" value="&lt;b&gt;Service (service.yml)&lt;/b&gt;&lt;br&gt;Tipo: NodePort (Porta 30080)&lt;br&gt;IP Estável + Balanceador interno" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#8e24aa;fontColor=#4a148c;fontSize=12;" vertex="1" parent="worker_content">
+          <mxGeometry x="540" y="20" width="250" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- POD 1 (com containers) -->
+        <mxCell id="pod_box" value="Pod (pod.yml) [Menor unidade executável]" style="swimlane;fontStyle=1;align=left;spacingLeft=10;verticalAlign=top;startSize=26;html=1;fillColor=#ffffff;strokeColor=#326ce5;fontColor=#1a4299;fontSize=12;rounded=1;" vertex="1" parent="worker_content">
+          <mxGeometry x="380" y="140" width="410" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="container1" value="&lt;b&gt;Container de Aplicação&lt;/b&gt;&lt;br&gt;Imagem: usuario/my_app (Docker Hub)&lt;br&gt;Porta interna: 80" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontColor=#0d47a1;fontSize=11;" vertex="1" parent="pod_box">
+          <mxGeometry x="20" y="40" width="230" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pod_storage" value="Volume / Rede Compartilhada&#xa;(Mesmo IP e Localhost)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede7f6;strokeColor=#7e57c2;fontColor=#311b92;fontSize=10;" vertex="1" parent="pod_box">
+          <mxGeometry x="20" y="115" width="230" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pod_label" value="&lt;b&gt;Labels:&lt;/b&gt;&lt;br&gt;app: meu-app" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;fontColor=#f57f17;fontSize=11;" vertex="1" parent="pod_box">
+          <mxGeometry x="270" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ================= DOCKER HUB ================= -->
+        <mxCell id="docker_hub" value="&lt;b&gt;Docker Hub / Registry&lt;/b&gt;&lt;br&gt;Repositório de Imagens&#xa;(usuario/my_app)" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#0db7ed;strokeColor=#0288d1;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="180" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- ================= CONEXÕES / SETAS ================= -->
+
+        <!-- Kubectl -> Kube-apiserver -->
+        <mxCell id="edge_kubectl_api" value="1. Envia YAML (POST/PUT)&#xa;kubectl apply -f" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1a4299;strokeWidth=2;fontSize=11;fontColor=#1a4299;" edge="1" parent="1" source="kubectl" target="apiserver">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Kube-apiserver <-> etcd -->
+        <mxCell id="edge_api_etcd" value="Salva/Lê&#xa;Estado" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2e7d32;strokeWidth=2;fontSize=11;fontColor=#2e7d32;" edge="1" parent="1" source="apiserver" target="etcd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Kube-apiserver <-> Scheduler -->
+        <mxCell id="edge_api_sched" value="Notifica Pod&#xa;sem Nó" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#e65100;strokeWidth=2;fontSize=11;fontColor=#e65100;" edge="1" parent="1" source="apiserver" target="scheduler">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Kube-apiserver <-> Controller Manager -->
+        <mxCell id="edge_api_cm" value="Monitora e&#xa;Regula Estado" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4a148c;strokeWidth=2;fontSize=11;fontColor=#4a148c;" edge="1" parent="1" source="apiserver" target="controller_manager">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Kube-apiserver <-> Kubelet -->
+        <mxCell id="edge_api_kubelet" value="2. Instrução para&#xa;criar Pod" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#326ce5;strokeWidth=2;fontSize=11;fontColor=#01579b;" edge="1" parent="1" source="apiserver" target="kubelet">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="430" y="490" />
+              <mxPoint x="430" y="490" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Kubelet -> Container Runtime -->
+        <mxCell id="edge_kubelet_runtime" value="CRI: Iniciar&#xa;Containers" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#263238;strokeWidth=2;fontSize=11;" edge="1" parent="1" source="kubelet" target="runtime">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Container Runtime -> Docker Hub -->
+        <mxCell id="edge_runtime_hub" value="3. docker pull / fetch&#xa;imagem personalizada" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0288d1;strokeWidth=2;fontSize=11;dashed=1;" edge="1" parent="1" source="runtime" target="docker_hub">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="760" />
+              <mxPoint x="200" y="490" />
+              <mxPoint x="1030" y="490" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Runtime -> Pod -->
+        <mxCell id="edge_runtime_pod" value="Cria e Executa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#263238;strokeWidth=2;fontSize=11;" edge="1" parent="1" source="runtime" target="container1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Navegador -> Service (NodePort) -->
+        <mxCell id="edge_browser_service" value="4. Requisição HTTP&#xa;porta 30080" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d79b00;strokeWidth=2;fontSize=11;" edge="1" parent="1" source="browser" target="service">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="605" />
+              <mxPoint x="280" y="540" />
+              <mxPoint x="1005" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Service -> Pod (Selector) -->
+        <mxCell id="edge_service_pod" value="Encaminha para Pod&#xa;com label 'app: meu-app'" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#8e24aa;strokeWidth=2;fontSize=11;" edge="1" parent="1" source="service" target="pod_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Kube-proxy -> Service -->
+        <mxCell id="edge_proxy_service" value="Atualiza Regras&#xa;de Rede" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#004d40;strokeWidth=1.5;fontSize=10;dashed=1;" edge="1" parent="1" source="kubeproxy" target="service">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

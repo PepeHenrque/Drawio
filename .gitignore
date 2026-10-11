@@ -1,0 +1,8 @@
+# Ignorar arquivos do Otavio no commit do Pedro
+arquivos_otavio/
+
+# Sistema
+.vscode/
+Thumbs.db
+Desktop.ini
+.DS_Store
