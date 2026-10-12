@@ -1,80 +1,54 @@
-# ☸️ Arquitetura Kubernetes & Implementação com Minikube
+# Arquitetura Kubernetes e Manifestos de Implementação
 
-> **Atividade Prática — Unidade 9: Kubernetes**  
-> **Integrantes da Dupla:** Pedro e Otávio  
-> **Repositório:** [Link do GitHub da Dupla]  
+Trabalho prático da disciplina sobre arquitetura e funcionamento do Kubernetes (Unidade 9).
 
----
-
-## 📌 1. Visão Geral da Arquitetura do Kubernetes
-
-O Kubernetes (K8s) é uma plataforma de código aberto para automação de implantação, escalonamento e gerenciamento de aplicações em contêineres. O cluster é dividido em duas partes fundamentais: o **Control Plane (Plano de Controle)** e os **Worker Nodes (Nós de Execução)**.
-
-O diagrama completo e editável desta arquitetura está disponível no arquivo [`kubernetes.drawio`](kubernetes.drawio) (abra no VS Code com a extensão *Draw.io Integration*).
-
-```
-+-------------------------------------------------------------------------------+
-|                             CONTROL PLANE (MASTER)                           |
-|  +--------------------+   +-------------------+   +------------------------+  |
-|  |   kube-apiserver   |<->|       etcd        |   | kube-controller-manager|  |
-|  +--------------------+   +-------------------+   +------------------------+  |
-|           ^                         ^                          ^              |
-|           |                 +-----------------+                |              |
-|           +---------------->| kube-scheduler  |<---------------+              |
-|                             +-----------------+                               |
-+-------------------------------------------------------------------------------+
-       | (Comunicação REST/TLS)
-       v
-+-------------------------------------------------------------------------------+
-|                                WORKER NODE                                    |
-|  +--------------------+   +-------------------+   +------------------------+  |
-|  |      kubelet       |   |    kube-proxy     |   |   Container Runtime    |  |
-|  +--------------------+   +-------------------+   +------------------------+  |
-|           |                                                    |              |
-|           v                                                    v              |
-|     +-----------+         +-------------------+          +-----------+        |
-|     |  Service  |<------->|   Pod (Pod.yml)   |<-------->| Container |        |
-|     | (NodePort)|         |   Labels: meu-app |          | (Port 80) |        |
-|     +-----------+         +-------------------+          +-----------+        |
-+-------------------------------------------------------------------------------+
-```
+**Integrantes:**
+- Pedro Henrique
+- Otávio
 
 ---
 
-## 🛠️ 2. Descrição dos Componentes e Ferramentas
+## 1. Visão Geral da Arquitetura
 
-### 🧠 Control Plane (Nó Mestre)
-Responsável pelas decisões globais sobre o cluster (ex: agendamento), detecção e resposta a eventos.
-* **`kube-apiserver`**: É a porta de entrada do Control Plane. Expõe a API REST do Kubernetes e processa todas as requisições internas e externas (recebidas via `kubectl`).
-* **`etcd`**: Banco de dados chave-valor distribuído e altamente confiável. Armazena todo o estado do cluster, configurações e dados dos objetos.
-* **`kube-scheduler`**: Monitora Pods recém-criados que ainda não possuem nó atribuído e seleciona o melhor Worker Node para executá-los com base em recursos disponíveis.
-* **`kube-controller-manager`**: Executa processos de controle em segundo plano para manter o estado atual do cluster igual ao estado desejado (ex: Node Controller, ReplicaSet Controller, Endpoint Controller).
+O Kubernetes é uma plataforma de orquestração de contêineres projetada para automatizar a implantação, o dimensionamento e o gerenciamento de aplicações distribuídas. O cluster é estruturado em duas camadas principais: o **Control Plane** (responsável pelo gerenciamento e estado do cluster) e os **Worker Nodes** (máquinas responsáveis pela execução das cargas de trabalho).
+
+O diagrama visual da arquitetura encontra-se modelado no arquivo `kubernetes.drawio`, que pode ser visualizado diretamente no VS Code utilizando a extensão *Draw.io Integration*.
 
 ---
 
-### 💻 Worker Nodes (Nós de Trabalho)
-Máquinas (físicas ou virtuais) onde as aplicações em contêineres realmente rodam.
-* **`kubelet`**: Agente principal que roda em cada nó. Garante que os contêineres descritos nos PodSpecs estejam em execução e saudáveis.
-* **`kube-proxy`**: Gerencia as regras de rede em cada nó, permitindo a comunicação entre Pods e viabilizando o funcionamento dos **Services** tanto interna quanto externamente.
-* **`Container Runtime`**: O software responsável por baixar as imagens e rodar os contêineres (ex: *containerd*, *Docker*, *CRI-O*).
+## 2. Descrição das Ferramentas e Componentes
+
+### 2.1 Control Plane (Plano de Controle)
+
+O Control Plane atua como o núcleo de controle do cluster, coordenando todas as operações e mantendo o estado desejado dos recursos:
+
+- **kube-apiserver:** Ponto central de comunicação de todo o cluster. Expõe a API REST do Kubernetes e autentica, autoriza e valida todas as requisições enviadas tanto por usuários externos (via `kubectl`) quanto por componentes internos.
+- **etcd:** Banco de dados distribuído do tipo chave-valor, consistente e altamente disponível. Armazena todo o estado do cluster, configurações e dados de persistência de todos os objetos.
+- **kube-scheduler:** Componente responsável por monitorar Pods recém-criados que ainda não possuem um nó atribuído, selecionando o Worker Node mais adequado para alocação com base em requisitos de recursos, afinidades e restrições.
+- **kube-controller-manager:** Executa os processos de controle em segundo plano. Monitora continuamente o estado atual do cluster e atua para convergí-lo ao estado desejado (inclui o Node Controller, ReplicaSet Controller e Endpoint Controller).
+
+### 2.2 Worker Nodes (Nós de Trabalho)
+
+Os Worker Nodes são os nós operacionais onde os contêineres são executados:
+
+- **kubelet:** Agente em execução em cada nó do cluster. É responsável por se comunicar com o `kube-apiserver` e garantir que os contêineres descritos nas especificações dos Pods estejam saudáveis e em execução.
+- **kube-proxy:** Responsável pelo gerenciamento das regras de rede em cada nó, encaminhando o tráfego destinado aos serviços e viabilizando o balanceamento de carga entre os Pods.
+- **Container Runtime:** Software subjacente encarregado de gerenciar o ciclo de vida dos contêineres (baixar imagens, inicializar e finalizar contêineres). Exemplos: containerd, CRI-O, Docker.
+
+### 2.3 Objetos e Ferramentas do Ecossistema
+
+- **kubectl:** Ferramenta de linha de comando oficial para interação e envio de instruções declarativas (em formato YAML) para o `kube-apiserver`.
+- **Pod:** Menor unidade implantável do Kubernetes. Representa uma instância de um processo no cluster e encapsula um ou mais contêineres que compartilham o mesmo namespace de rede (endereço IP e portas) e volumes de armazenamento.
+- **Service:** Abstração que expõe uma aplicação em execução em um conjunto de Pods sob um ponto de acesso de rede estável (IP virtual e DNS), provendo balanceamento de carga. O tipo `NodePort` disponibiliza o serviço em uma porta estática em cada nó, possibilitando o acesso externo via navegador.
+- **ReplicaSet:** Controlador cujo objetivo primário é garantir a disponibilidade de um número fixo de réplicas de Pods em execução contínua em qualquer momento determinado.
 
 ---
 
-### 📦 Objetos e Ferramentas do Kubernetes
-* **`kubectl`**: Interface de linha de comando (CLI) usada pelos administradores e desenvolvedores para enviar instruções e manifestos YAML ao `kube-apiserver`.
-* **`Pod`**: A menor e mais básica unidade de execução no Kubernetes. Encapsula um ou mais contêineres que compartilham rede (IP e portas), armazenamento e especificações de execução.
-* **`Service`**: Abstração que define um conjunto de Pods e uma política de acesso a eles. Fornece um IP e DNS estáveis, garantindo balanceamento de carga mesmo se os Pods forem recriados com novos IPs.
-  * **ClusterIP**: Apenas acessível internamente no cluster.
-  * **NodePort**: Abre uma porta dedicada em cada nó do cluster (faixa 30000-32767), permitindo acesso externo direto pelo navegador.
-  * **LoadBalancer**: Integração com balanceadores de carga em nuvem.
-* **`ReplicaSet`**: Objeto responsável por garantir que um número específico de réplicas de um Pod esteja sempre em execução, oferecendo tolerância a falhas.
+## 3. Manifestos de Implementação
 
----
+### 3.1 Pod (`pod.yml`)
 
-## 📄 3. Códigos YAML Desenvolvidos
-
-### `pod.yml` (Implementação do Pod)
-Manifesto simples para subir um Pod utilizando uma imagem customizada do Docker Hub:
+Implementa um Pod executando uma imagem própria publicada no Docker Hub:
 
 ```yaml
 apiVersion: v1
@@ -86,13 +60,14 @@ metadata:
 spec:
   containers:
   - name: container-app
-    image: pedrorodrigues/meu-app:latest # Substituir pela imagem do seu Docker Hub
+    image: pepehenrque/my_app:latest
     ports:
     - containerPort: 80
 ```
 
-### `service.yml` (Implementação do Service)
-Manifesto para expor o Pod externamente via **NodePort** na porta `30080`:
+### 3.2 Service (`service.yml`)
+
+Implementa um Service do tipo `NodePort` para expor o Pod através da porta 30080:
 
 ```yaml
 apiVersion: v1
@@ -111,52 +86,26 @@ spec:
 
 ---
 
-## 🚀 4. Passo a Passo de Execução no Minikube e Coleta de Artefatos
+## 4. Instruções de Implantação no Minikube
 
-### Passo 1: Criar sua Imagem Própria e subir no Docker Hub (Requisito Mínimo)
-No terminal da sua máquina:
-```bash
-# 1. Crie uma pasta temporaria com um index.html
-mkdir app-docker && cd app-docker
-echo "<h1>Kubernetes Rodando - Dupla: Pedro e Otavio</h1>" > index.html
+1. **Inicialização do cluster:**
+   ```bash
+   minikube start
+   ```
 
-# 2. Crie o Dockerfile simples
-echo "FROM nginx:alpine" > Dockerfile
-echo "COPY index.html /usr/share/nginx/html/index.html" >> Dockerfile
+2. **Aplicação dos manifestos:**
+   ```bash
+   kubectl apply -f pod.yml
+   kubectl apply -f service.yml
+   ```
 
-# 3. Faça build e push para o Docker Hub
-docker build -t SEU_USUARIO_DOCKERHUB/meu-app:latest .
-docker login
-docker push SEU_USUARIO_DOCKERHUB/meu-app:latest
-```
+3. **Verificação do status dos recursos:**
+   ```bash
+   kubectl get pods -o wide
+   kubectl get services meu-service
+   ```
 
-### Passo 2: Iniciar o Minikube
-```bash
-minikube start
-```
-
-### Passo 3: Aplicar os Manifestos do Kubernetes
-```bash
-kubectl apply -f pod.yml
-kubectl apply -f service.yml
-```
-
-### Passo 4: Verificar a Execução (Comandos para Artefatos/Prints)
-```bash
-# Listar status do Pod (deve estar com STATUS: Running)
-kubectl get pods -o wide
-
-# Listar status do Service (deve exibir o NodePort 30080)
-kubectl get services meu-service
-
-# Descrever o Pod e confirmar o pull da imagem
-kubectl describe pod meu-pod
-```
-
-### Passo 5: Acessar pelo Navegador (Artefato de Navegação)
-No Minikube, execute o comando abaixo para abrir a URL no navegador:
-```bash
-minikube service meu-service
-```
-
-
+4. **Acesso à aplicação:**
+   ```bash
+   minikube service meu-service
+   ```
